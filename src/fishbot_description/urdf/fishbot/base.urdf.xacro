@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- 导入惯性宏定义 -->
+    <xacro:include filename="common_inertia.xacro" />
+
+    <xacro:macro name="base_xacro" params="length radius">
+        <!-- 虚拟基座 -->
+        <link name="base_footprint" />
+        
+        <joint name="base_joint" type="fixed">
+            <parent link="base_footprint" />
+            <child link="base_link" />
+            <origin xyz="0.0 0.0 ${length/2.0 + 0.032 - 0.001}" rpy="0 0 0" />
+        </joint>
+        
+        <!-- 身体部件 -->
+        <link name="base_link">
+            
+            <!-- 视觉外观 -->
+            <visual>
+                <origin xyz="0 0 0.0" rpy="0 0 0" />
+                <geometry>
+                    <cylinder length="${length}" radius="${radius}" />
+                </geometry>
+                <material name="white">
+                    <color rgba="1.0 1.0 1.0 0.5"/>
+                </material>
+            </visual>
+            
+            <!-- 碰撞属性 -->
+            <collision>
+                <origin xyz="0 0 0.0" rpy="0 0 0" />
+                <geometry>
+                    <cylinder length="${length}" radius="${radius}" />
+                </geometry>
+            </collision>
+            
+            <!-- 质量与惯性 -->
+            <xacro:cylinder_inertia m="1.0" r="${radius}" h="${length}" />
+            
+        </link>
+    </xacro:macro>
+
+</robot>

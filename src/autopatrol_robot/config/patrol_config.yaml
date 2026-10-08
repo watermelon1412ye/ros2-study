@@ -1,0 +1,23 @@
+patrol_node:
+  ros__parameters:
+    # Set true for Gazebo/rosbag simulation.  Change to false on hardware.
+    use_sim_time: true
+
+    # The initial pose is expressed in the map frame, not in Gazebo world frame.
+    initial_point: [-0.424, -5.680, 0.024]
+
+    # Keep false when restarting patrol while Gazebo is still running. Set true
+    # only when the robot is physically at initial_point, such as a fresh spawn.
+    reset_initial_pose_on_start: false
+    clear_costmaps_on_start: true
+
+    # Three values form one waypoint: x, y, yaw in the map frame.
+    target_points: [
+      1.498, -5.898, 1.692,
+      -0.424, -5.680, 0.024
+    ]
+
+    # 1 means run one patrol loop and exit.  Set to 0 for continuous patrol.
+    patrol_loops: 1
+    navigation_timeout_sec: 60.0
+    image_save_path: "/tmp/autopatrol_images"

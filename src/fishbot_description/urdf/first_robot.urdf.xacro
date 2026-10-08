@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!-- ============================================ -->
+<!-- robot 标签：声明使用 Xacro 宏语言，名称为 first_robot
+     xmlns:xacro 必须添加，否则无法使用 Xacro 功能
+     ============================================ -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="first_robot">
+
+    <!-- ============================================ -->
+    <!-- 宏1：base_link（机器人身体）
+         参数：length（高度），radius（半径）
+         注意：link 的名称是固定的 "base_link"，因为机器人只有一个身体
+         所以这个宏只需要调用一次
+         ============================================ -->
+    <xacro:macro name="base_link" params="length radius">
+        <link name="base_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <!-- ${length} 和 ${radius} 会被实际值替换 -->
+                    <cylinder length="${length}" radius="${radius}" />
+                </geometry>
+                <material name="white">
+                    <color rgba="1.0 1.0 1.0 0.5" />
+                </material>
+            </visual>
+        </link>
+    </xacro:macro>
+
+    <!-- ============================================ -->
+    <!-- 宏2：imu_link（IMU 传感器）
+         参数：imu_name（IMU名称），xyz（安装位置）
+         注意：link 和 joint 的名称都使用了 ${imu_name}
+         这样每次调用都会生成唯一的名称，实现复用
+         比如调用两次：imu_up 和 imu_down，生成不同的 link 和 joint
+         ============================================ -->
+    <xacro:macro name="imu_link" params="imu_name xyz">
+        <!-- 使用 ${imu_name}_link 生成唯一的 link 名称 -->
+        <link name="${imu_name}_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <box size="0.02 0.02 0.02" />
+                </geometry>
+                <material name="black">
+                    <color rgba="0 0 0 0.5" />
+                </material>
+            </visual>
+        </link>
+        <!-- 使用 ${imu_name}_joint 生成唯一的 joint 名称 -->
+        <joint name="${imu_name}_joint" type="fixed">
+            <parent link="base_link" />
+            <child link="${imu_name}_link" />
+            <!-- ${xyz} 指定安装位置 -->
+            <origin xyz="${xyz}" />
+        </joint>
+    </xacro:macro>
+
+    <!-- ============================================ -->
+    <!-- 调用宏，生成实际的部件：
+         1. base_link：高度 0.12m，半径 0.1m
+         2. imu_up：安装在 base_link 上方 0.02m 处
+         3. imu_down：安装在 base_link 下方 0.02m 处
+         ============================================ -->
+    <xacro:base_link length="0.12" radius="0.1" />
+    <xacro:imu_link imu_name="imu_up" xyz="0 0 0.02" />
+    <xacro:imu_link imu_name="imu_down" xyz="0 0 -0.02" />
+
+
+</robot>

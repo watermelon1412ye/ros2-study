@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:macro name="gazebo_control_plugin">
+        <gazebo>
+            <!-- 差速驱动插件 -->
+            <plugin name='diff_drive' filename='libgazebo_ros_diff_drive.so'>
+                
+                <!-- ROS 话题配置 -->
+                <ros>
+                    <namespace>/</namespace>
+                    <remapping>cmd_vel:=cmd_vel</remapping>
+                    <remapping>odom:=odom</remapping>
+                </ros>
+                
+                <!-- 更新频率（Hz） -->
+                <update_rate>30</update_rate>
+                
+                <!-- 轮子关节名称 -->
+                <left_joint>left_wheel_joint</left_joint>
+                <right_joint>right_wheel_joint</right_joint>
+                
+                <!-- 运动学参数 -->
+                <wheel_separation>0.2</wheel_separation>    <!-- 轮距：0.2m -->
+                <wheel_diameter>0.064</wheel_diameter>      <!-- 轮子直径：0.064m -->
+                
+                <!-- 限制参数 -->
+                <max_wheel_torque>20</max_wheel_torque>              <!-- 最大扭矩 -->
+                <max_wheel_acceleration>1.0</max_wheel_acceleration>  <!-- 最大加速度 -->
+                
+                <!-- 发布配置 -->
+                <publish_odom>true</publish_odom>           <!-- 发布里程计 -->
+                <publish_odom_tf>true</publish_odom_tf>     <!-- 发布里程计 TF -->
+                <publish_wheel_tf>true</publish_wheel_tf>   <!-- 发布轮子 TF -->
+                
+                <!-- 坐标系配置 -->
+                <odometry_frame>odom</odometry_frame>                <!-- 里程计坐标系 -->
+                <robot_base_frame>base_footprint</robot_base_frame>  <!-- 机器人基座坐标系 -->
+                
+            </plugin>
+        </gazebo>
+    </xacro:macro>
+
+</robot>
