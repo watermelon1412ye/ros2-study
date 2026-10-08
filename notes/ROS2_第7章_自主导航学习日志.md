@@ -2019,4 +2019,134 @@ README 记录：
 - 自动巡检启动命令。
 - 巡检图片保存路径。
 
-7.6.2 和 7.6.3 的 Gitee/GitHub 托管还没有执行，原因是当前工作区 `.git` 目录异常，且没有远程仓库地址和账号认证信息。后续应在干净 Git 仓库中再执行提交和推送。
+### 2026-10-08 完成 7.6.3 GitHub SSH 托管
+
+GitHub 仓库：
+
+```text
+https://github.com/watermelon1412ye/ros2-study
+```
+
+最终验证结果：
+
+```text
+本地分支：master
+远程跟踪分支：origin_github/master
+首次提交：34a6f97 初始提交：完成 ROS 2 自主导航与自动巡检项目
+认证方式：SSH
+推送结果：master -> master
+```
+
+推送成功的关键输出：
+
+```text
+To github.com:watermelon1412ye/ros2-study.git
+ * [new branch]      master -> master
+分支 'master' 设置为跟踪来自 'origin_github' 的远程分支 'master'。
+```
+
+#### 提交前的仓库整理
+
+ROS 2 工作空间会生成 `build/`、`install/` 和 `log/`，这些文件体积大、可由源码重新构建，不应提交。仓库根目录新增 `.gitignore`，同时排除 Python 缓存和本机 IDE 配置。
+
+根目录新增 `README.md`，用于 GitHub 仓库首页展示项目介绍、依赖、构建和运行方法。
+
+首次提交：
+
+```bash
+cd /home/fishros/chapt6/chapt6_ws
+git add .
+git diff --cached
+git commit -m "初始提交：完成 ROS 2 自主导航与自动巡检项目"
+```
+
+#### 配置 GitHub 远程仓库
+
+```bash
+git remote add origin_github git@github.com:watermelon1412ye/ros2-study.git
+git branch -M master
+git remote -v
+```
+
+当前 `origin` 和 `origin_github` 都指向同一个 GitHub 仓库。因为 `master` 已跟踪 `origin_github/master`，后续直接执行 `git push` 即可。
+
+#### SSH 密钥认证
+
+GitHub SSH 推送失败的原因是 Git 没有使用正确的私钥。当前仓库通过下面的配置固定使用指定密钥：
+
+```bash
+git config core.sshCommand \
+  "ssh -i /home/fishros/.ssh/id_ed25519 -o IdentitiesOnly=yes"
+```
+
+参数理解：
+
+- `core.sshCommand`：为当前 Git 仓库指定 SSH 命令。
+- `-i`：指定身份验证使用的私钥。
+- `IdentitiesOnly=yes`：只尝试明确指定的密钥，避免 SSH 选错密钥。
+
+验证 GitHub SSH 登录：
+
+```bash
+ssh -T git@github.com
+```
+
+安全规则：
+
+- `id_ed25519` 是私钥，只能保存在本机，绝对不能上传或分享。
+- `id_ed25519.pub` 是公钥，可以添加到 GitHub 账号。
+- GitHub SSH 认证不需要在 `git push` 时输入账号密码。
+
+#### 首次推送
+
+```bash
+git push -u origin_github master
+```
+
+其中 `-u` 会记录上游分支。建立跟踪关系后，日常同步可以简化为：
+
+```bash
+git pull --rebase
+git push
+```
+
+#### 日常开发工作流
+
+```bash
+cd /home/fishros/chapt6/chapt6_ws
+
+git status
+git diff
+
+git add path/to/file
+git diff --cached
+git commit -m "清楚描述本次修改"
+git push
+```
+
+优先使用 `git add path/to/file`，可以避免把无关文件一起提交。使用 `git add .` 前，应先确认 `.gitignore` 正确并检查 `git status`。
+
+查看提交历史和分支关系：
+
+```bash
+git log --oneline --graph --decorate --all
+git branch -vv
+git remote -v
+```
+
+克隆项目：
+
+```bash
+git clone git@github.com:watermelon1412ye/ros2-study.git
+```
+
+#### 本节结论
+
+7.6.1 自描述文件和 7.6.3 GitHub 托管已经完成。现在已经掌握：
+
+```text
+整理待提交文件 -> 创建本地提交 -> 配置 SSH 密钥
+-> 添加 GitHub 远程仓库 -> 建立上游分支 -> 推送与拉取
+```
+
+7.6.2 Gitee 托管未执行；如以后需要同时推送到 Gitee，可以新增一个独立的 `gitee` 远程名称，不影响当前 GitHub 配置。

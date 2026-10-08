@@ -1,6 +1,6 @@
 # ROS 2 学习进度与命令速查
 
-更新时间：2026-09-17
+更新时间：2026-10-08
 
 这个文件记录各章当前进度，以及按小节整理的“学习时直接使用的命令集合”。目前覆盖第 7 章；后续学习第 8、9 章时，在本文件继续新增对应章节的命令速查。详细学习过程、命令解释、流程图和排错记录统一写在章节日志里：
 
@@ -707,14 +707,107 @@ ros2 launch autopatrol_robot autopatrol.launch.py
 find /tmp/autopatrol_images -maxdepth 1 -type f -name '*.png' -printf '%f %s bytes\n'
 ```
 
-## 7.6 当前状态
+## 7.6 GitHub SSH 托管（已完成）
 
-已完成：
+完成日期：2026-10-08
 
-- 添加 `src/README.md`，记录功能包、构建命令、导航启动命令、自动巡检命令和图片保存路径。
+当前仓库状态：
 
-未执行：
+```text
+GitHub: https://github.com/watermelon1412ye/ros2-study
+本地分支: master
+上游分支: origin_github/master
+首次提交: 34a6f97 初始提交：完成 ROS 2 自主导航与自动巡检项目
+认证方式: SSH
+```
 
-- Gitee/GitHub 远程托管。原因是当前工作区 `.git` 目录异常，且没有远程仓库地址和账号认证信息。
+首次配置与推送使用的核心命令：
 
-后续如果要继续 7.6，应先确定使用 Gitee 还是 GitHub，然后在一个干净 Git 仓库中执行 `git init`、`git add`、`git commit`、`git remote add`、`git push`。
+```bash
+cd /home/fishros/chapt6/chapt6_ws
+
+git config user.name "watermelon1412ye"
+git config user.email "watermelon1412ye@users.noreply.github.com"
+
+git remote add origin_github git@github.com:watermelon1412ye/ros2-study.git
+git branch -M master
+
+git config core.sshCommand \
+  "ssh -i /home/fishros/.ssh/id_ed25519 -o IdentitiesOnly=yes"
+
+git push -u origin_github master
+```
+
+`-u` 建立了本地 `master` 与远程 `origin_github/master` 的跟踪关系，以后可以直接使用 `git push` 和 `git pull`。
+
+日常更新推荐流程：
+
+```bash
+cd /home/fishros/chapt6/chapt6_ws
+
+# 1. 查看修改
+git status
+git diff
+
+# 2. 优先添加明确的文件；确认无误时也可以使用 git add .
+git add path/to/file
+git diff --cached
+
+# 3. 创建本地提交
+git commit -m "说明本次修改内容"
+
+# 4. 推送到 GitHub
+git push
+```
+
+从 GitHub 同步更新：
+
+```bash
+git pull --rebase
+```
+
+查看仓库、分支和历史：
+
+```bash
+git remote -v
+git branch -vv
+git log --oneline --graph --decorate --all
+```
+
+提交前常用撤销命令：
+
+```bash
+# 撤销工作区中某个文件尚未暂存的修改
+git restore path/to/file
+
+# 取消暂存，但保留工作区修改
+git restore --staged path/to/file
+```
+
+在其他电脑克隆项目：
+
+```bash
+git clone git@github.com:watermelon1412ye/ros2-study.git
+```
+
+SSH 检查与排错：
+
+```bash
+ssh -T git@github.com
+git config --get core.sshCommand
+git remote -v
+```
+
+如果 Git 没有选择正确的私钥，重新指定：
+
+```bash
+git config core.sshCommand \
+  "ssh -i /home/fishros/.ssh/id_ed25519 -o IdentitiesOnly=yes"
+```
+
+安全注意事项：
+
+- `/home/fishros/.ssh/id_ed25519` 是私钥，不能上传、复制给别人或提交到 Git。
+- `/home/fishros/.ssh/id_ed25519.pub` 是公钥，可以添加到 GitHub 的 SSH keys。
+- GitHub SSH 推送不使用 GitHub 登录密码。
+- 当前 `origin` 与 `origin_github` 指向同一个仓库；日常操作使用已建立跟踪关系的 `origin_github`。
